@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  sales-taxes:
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile
+    image: sales-taxes:latest
+    ports:
+      - '8080:80'
+    hostname: sales-taxes
+    restart: on-failure
