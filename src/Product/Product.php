@@ -2,8 +2,9 @@
 
 namespace SalesTaxes\Product;
 
+use Brick\Money\Context\CashContext;
 use Brick\Money\Money;
-use SalesTaxes\Tax\Tax;
+use SalesTaxes\Tax\TaxRate;
 
 final class Product
 {
@@ -16,22 +17,29 @@ final class Product
 	/** @var int */
 	private $quantity;
 
-	/** @var Tax */
-	private $tax;
+	/** @var TaxRate[] */
+	private $taxes;
 
-	public function __construct(string $name, Price $price, int $quantity, Tax $tax)
+	/**
+	 * @param TaxRate[] $taxes
+	 */
+	public function __construct(string $name, Price $price, int $quantity, array $taxes)
 	{
 		$this->name = $name;
 		$this->price = $price;
 		$this->quantity = $quantity;
-		$this->tax = $tax;
+		$this->taxes = $taxes;
 	}
 
 	public function taxes(): Money
 	{
-		return $this->tax->forPrice(
-			$this->price->forQuantity($this->quantity)
-		);
+		$taxes = Money::zero('EUR', new CashContext(5));
+
+		foreach ($this->taxes as $tax) {
+			$taxes = $taxes->plus($tax->forPrice($this->price));
+		}
+
+		return $taxes->multipliedBy($this->quantity);
 	}
 
 	public function priceAfterTaxes(): Price

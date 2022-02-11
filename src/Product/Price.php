@@ -36,7 +36,7 @@ final class Price
 	{
 		return Price::of(
 			$this->value
-				->plus($price->toFloat(), RoundingMode::UP)
+				->plus($price->value, RoundingMode::UP)
 				->getAmount()
 				->toFloat()
 		);
@@ -56,21 +56,14 @@ final class Price
 	{
 		return Price::of(
 			$this->value
-				->plus($value, RoundingMode::UP)
+				->plus($value->toRational(), RoundingMode::UP)
 				->getAmount()
 				->toFloat()
 		);
 	}
 
-	public function toFloat(): float
-	{
-		return $this->value
-			->getAmount()
-			->toFloat();
-	}
-
 	public function __toString(): string
 	{
-		return (string) $this->toFloat();
+		return number_format($this->value->getAmount()->toFloat(), 2);
 	}
 }
