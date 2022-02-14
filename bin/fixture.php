@@ -1,7 +1,9 @@
 <?php
 
+use SalesTaxes\Cart\Cart;
 use SalesTaxes\Product\Price;
 use SalesTaxes\Product\Product;
+use SalesTaxes\Receipt\Receipt;
 use SalesTaxes\TaxRate\ImportTaxRate;
 use SalesTaxes\TaxRate\StandardTaxRate;
 use SalesTaxes\TaxRate\FreeTaxRate;
@@ -9,7 +11,8 @@ use SalesTaxes\TaxRate\FreeTaxRate;
 require __DIR__ . '/../vendor/autoload.php';
 
 $carts = [
-	[
+	// Input 1
+	Cart::createWithProducts([
 		Product::create('book', Price::of(12.49), 2, [
 			new FreeTaxRate()
 		]),
@@ -18,11 +21,11 @@ $carts = [
 		]),
 		Product::create('chocolate bar', Price::of(0.85), 1, [
 			new FreeTaxRate()
-		]),
-		'Sales Taxes: 1.50',
-		'Total: 42.32'
-	],
-	[
+		])
+	]),
+
+	// Input 2
+	Cart::createWithProducts([
 		Product::create('imported box of chocolates', Price::of(10.00), 1, [
 			new FreeTaxRate(),
 			new ImportTaxRate()
@@ -30,11 +33,11 @@ $carts = [
 		Product::create('imported bottle of perfume', Price::of(47.50), 1, [
 			new StandardTaxRate(),
 			new ImportTaxRate()
-		]),
-		'Sales Taxes: 7.65',
-		'Total: 65.15'
-	],
-	[
+		])
+	]),
+
+	// Input 3
+	Cart::createWithProducts([
 		Product::create('imported bottle of perfume', Price::of(27.99), 1, [
 			new StandardTaxRate(),
 			new ImportTaxRate()
@@ -48,17 +51,13 @@ $carts = [
 		Product::create('imported box of chocolates', Price::of(11.25), 3, [
 			new FreeTaxRate(),
 			new ImportTaxRate()
-		]),
-		'Sales Taxes: 7.90',
-		'Total: 98.38'
-	]
+		])
+	])
 ];
 
 $i = 1;
 foreach ($carts as $cart) {
 	echo "-------- Output " , $i++ , " --------\n";
-    foreach ($cart as $product) {
-        echo $product . PHP_EOL;
-    }
-    echo PHP_EOL;
+    echo Receipt::fromCart($cart)->print();
+    echo PHP_EOL, PHP_EOL;
 }

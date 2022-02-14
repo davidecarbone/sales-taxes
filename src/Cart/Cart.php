@@ -48,14 +48,11 @@ final class Cart
 		return $totalTaxes;
 	}
 
-	public function exportPrintableList(): string
+	/**
+	 * @return Product[]
+	 */
+	public function products(): array
 	{
-		$output = '';
-
-		foreach ($this->products as $product) {
-			$output .= $product . PHP_EOL;
-		}
-
-		return $output;
+		return $this->products;
 	}
 }
