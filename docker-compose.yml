@@ -10,3 +10,8 @@ services:
       - '8080:80'
     hostname: sales-taxes
     restart: on-failure
+    volumes:
+      - .:/var/www/html
+      - vendor:/var/www/html/vendor
+volumes:
+  vendor:

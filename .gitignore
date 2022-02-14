@@ -3,4 +3,3 @@ vendor
 !.gitignore
 !.gitkeep
 !.docker
-!.htaccess
