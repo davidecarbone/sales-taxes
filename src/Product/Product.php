@@ -2,9 +2,7 @@
 
 namespace SalesTaxes\Product;
 
-use Brick\Money\Context\CashContext;
-use Brick\Money\Money;
-use SalesTaxes\Tax\TaxRate;
+use SalesTaxes\TaxRate\TaxRate;
 
 final class Product
 {
@@ -18,35 +16,44 @@ final class Product
 	private $quantity;
 
 	/** @var TaxRate[] */
-	private $taxes;
+	private $taxRates;
+
+	private function __construct()
+	{
+	}
 
 	/**
-	 * @param TaxRate[] $taxes
+	 * @param TaxRate[] $taxRates
 	 */
-	public function __construct(string $name, Price $price, int $quantity, array $taxes)
+	public static function create(string $name, Price $price, int $quantity, array $taxRates): self
 	{
-		$this->name = $name;
-		$this->price = $price;
-		$this->quantity = $quantity;
-		$this->taxes = $taxes;
+		$product = new self();
+		$product->name = $name;
+		$product->price = $price;
+		$product->quantity = $quantity;
+		$product->taxRates = $taxRates;
+
+		return $product;
 	}
 
-	public function taxes(): Money
+	public function taxes(): Cost
 	{
-		$taxes = Money::zero('EUR', new CashContext(5));
+		$taxes = Tax::of(0);
 
-		foreach ($this->taxes as $tax) {
-			$taxes = $taxes->plus($tax->forPrice($this->price));
+		foreach ($this->taxRates as $taxRate) {
+			$taxes = $taxes->add(
+				Tax::forPrice($this->price, $taxRate)
+			);
 		}
 
-		return $taxes->multipliedBy($this->quantity);
+		return $taxes->forQuantity($this->quantity);
 	}
 
-	public function priceAfterTaxes(): Price
+	public function priceAfterTaxes(): Cost
 	{
 		return $this->price
 			->forQuantity($this->quantity)
-			->plus($this->taxes());
+			->add($this->taxes());
 	}
 
 	public function __toString(): string

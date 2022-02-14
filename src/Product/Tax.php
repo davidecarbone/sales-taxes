@@ -3,10 +3,11 @@
 namespace SalesTaxes\Product;
 
 use Brick\Math\RoundingMode;
+use Brick\Money\Context\CashContext;
 use Brick\Money\Money;
 use SalesTaxes\TaxRate\TaxRate;
 
-final class Price implements Cost
+final class Tax implements Cost
 {
 	/** @var Money */
 	private $value;
@@ -18,36 +19,34 @@ final class Price implements Cost
 	public static function of(float $value): self
 	{
 		$instance = new self();
-		$instance->value = Money::of($value, 'EUR', null, RoundingMode::UP);
+		$instance->value = Money::of($value, 'EUR', new CashContext(5), RoundingMode::UP);
 
 		return $instance;
 	}
 
+	public static function forPrice(Price $price, TaxRate $taxRate): self
+	{
+		return Tax::of(
+			$price->taxForRate($taxRate)
+				->toFloat()
+		);
+	}
+
 	public function forQuantity(int $quantity): Cost
-	{
-		return Price::of(
-			$this->value
-				->multipliedBy($quantity)
-				->getAmount()
-				->toFloat()
-		);
-	}
-
-	public function add(Cost $price): Cost
-	{
-		return Price::of(
-			$this->value
-				->plus($price->toFloat(), RoundingMode::UP)
-				->getAmount()
-				->toFloat()
-		);
-	}
-
-	public function taxForRate(TaxRate $taxRate): Tax
 	{
 		return Tax::of(
 			$this->value
-				->multipliedBy($taxRate->toFloat(), RoundingMode::UP)
+				->multipliedBy($quantity, RoundingMode::UP)
+				->getAmount()
+				->toFloat()
+		);
+	}
+
+	public function add(Cost $tax): Cost
+	{
+		return Tax::of(
+			$this->value
+				->plus($tax->value, RoundingMode::UP)
 				->getAmount()
 				->toFloat()
 		);
@@ -55,9 +54,7 @@ final class Price implements Cost
 
 	public function toFloat(): float
 	{
-		return $this->value
-			->getAmount()
-			->toFloat();
+		return $this->value->getAmount()->toFloat();
 	}
 
 	public function __toString(): string

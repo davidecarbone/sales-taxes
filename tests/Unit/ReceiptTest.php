@@ -7,7 +7,7 @@ use SalesTaxes\Cart\Cart;
 use SalesTaxes\Product\Price;
 use SalesTaxes\Product\Product;
 use SalesTaxes\Receipt\Receipt;
-use SalesTaxes\Tax\TaxFreeRate;
+use SalesTaxes\TaxRate\FreeTaxRate;
 
 class ReceiptTest extends TestCase
 {
@@ -15,8 +15,8 @@ class ReceiptTest extends TestCase
 	public function it_prints()
 	{
 		$cart = Cart::createWithProducts([
-			new Product('book', Price::of(12.49), 2, [
-				new TaxFreeRate()
+			Product::create('book', Price::of(12.49), 2, [
+				new FreeTaxRate()
 			])
 		]);
 

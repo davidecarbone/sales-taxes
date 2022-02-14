@@ -2,45 +2,37 @@
 
 namespace SalesTaxes\Unit;
 
-use Brick\Math\RoundingMode;
-use Brick\Money\Context\CashContext;
-use Brick\Money\Money;
 use PHPUnit\Framework\TestCase;
 use SalesTaxes\Product\Price;
 use SalesTaxes\Product\Product;
-use SalesTaxes\Tax\ImportTaxRate;
-use SalesTaxes\Tax\StandardTaxRate;
+use SalesTaxes\Product\Tax;
+use SalesTaxes\TaxRate\FreeTaxRate;
+use SalesTaxes\TaxRate\ImportTaxRate;
+use SalesTaxes\TaxRate\StandardTaxRate;
 
 class ProductTest extends TestCase
 {
 	/** @test */
-	public function it_calculates_taxes_with_standard_rate()
+	public function it_accumulates_taxes_with_multiple_rates()
 	{
-		$product = new Product('music cd', Price::of(11.25), 3, [
-			new StandardTaxRate()
-		]);
-
-		$this->assertEquals(Money::of(3.45, 'EUR', new CashContext(5), RoundingMode::UP), $product->taxes());
-	}
-
-	/** @test */
-	public function it_calculates_taxes_with_multiple_rates()
-	{
-		$product = new Product('imported perfume', Price::of(47.50), 3, [
+		$product = Product::create('imported perfume', Price::of(47.50), 3, [
 			new StandardTaxRate(),
 			new ImportTaxRate(),
+			new FreeTaxRate()
 		]);
 
-		$this->assertEquals(Money::of(21.45, 'EUR', new CashContext(5), RoundingMode::UP), $product->taxes());
+		$this->assertEquals(Tax::of(21.45), $product->taxes());
 	}
 
 	/** @test */
 	public function it_calculates_total_price_after_taxes()
 	{
-		$product = new Product('imported chocolates', Price::of(11.25), 3, [
-			new StandardTaxRate()
+		$product = Product::create('imported chocolates', Price::of(11.25), 3, [
+			new StandardTaxRate(),
+			new ImportTaxRate(),
+			new FreeTaxRate()
 		]);
 
-		$this->assertEquals(Price::of(37.20), $product->priceAfterTaxes());
+		$this->assertEquals(Price::of(39.00), $product->priceAfterTaxes());
 	}
 }

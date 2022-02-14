@@ -9,9 +9,8 @@ class GoldenMasterTest extends TestCase
     public function testGoldenMaster()
     {
         global $argv;
-        $daysToRun = 30;
         $scriptToRun = __DIR__ . '/../../bin/fixture.php';
-        $argv = [$scriptToRun, $daysToRun];
+        $argv = [$scriptToRun];
 
         ob_start();
         include $scriptToRun;

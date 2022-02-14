@@ -2,10 +2,9 @@
 
 namespace SalesTaxes\Cart;
 
-use Brick\Money\Context\CashContext;
-use Brick\Money\Money;
 use SalesTaxes\Product\Price;
 use SalesTaxes\Product\Product;
+use SalesTaxes\Product\Tax;
 
 final class Cart
 {
@@ -38,12 +37,12 @@ final class Cart
 		return $totalPrice;
 	}
 
-	public function totalTaxes(): Money
+	public function totalTaxes(): Tax
 	{
-		$totalTaxes = Money::zero('EUR', new CashContext(5));
+		$totalTaxes = Tax::of(0);
 
 		foreach ($this->products as $product) {
-			$totalTaxes = $totalTaxes->plus($product->taxes());
+			$totalTaxes = $totalTaxes->add($product->taxes());
 		}
 
 		return $totalTaxes;

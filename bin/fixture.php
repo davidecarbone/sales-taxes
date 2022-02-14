@@ -2,32 +2,32 @@
 
 use SalesTaxes\Product\Price;
 use SalesTaxes\Product\Product;
-use SalesTaxes\Tax\ImportTaxRate;
-use SalesTaxes\Tax\StandardTaxRate;
-use SalesTaxes\Tax\TaxFreeRate;
+use SalesTaxes\TaxRate\ImportTaxRate;
+use SalesTaxes\TaxRate\StandardTaxRate;
+use SalesTaxes\TaxRate\FreeTaxRate;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 $carts = [
 	[
-		new Product('book', Price::of(12.49), 2, [
-			new TaxFreeRate()
+		Product::create('book', Price::of(12.49), 2, [
+			new FreeTaxRate()
 		]),
-		new Product('music CD', Price::of(14.99), 1, [
+		Product::create('music CD', Price::of(14.99), 1, [
 			new StandardTaxRate()
 		]),
-		new Product('chocolate bar', Price::of(0.85), 1, [
-			new TaxFreeRate()
+		Product::create('chocolate bar', Price::of(0.85), 1, [
+			new FreeTaxRate()
 		]),
 		'Sales Taxes: 1.50',
 		'Total: 42.32'
 	],
 	[
-		new Product('imported box of chocolates', Price::of(10.00), 1, [
-			new TaxFreeRate(),
+		Product::create('imported box of chocolates', Price::of(10.00), 1, [
+			new FreeTaxRate(),
 			new ImportTaxRate()
 		]),
-		new Product('imported bottle of perfume', Price::of(47.50), 1, [
+		Product::create('imported bottle of perfume', Price::of(47.50), 1, [
 			new StandardTaxRate(),
 			new ImportTaxRate()
 		]),
@@ -35,18 +35,18 @@ $carts = [
 		'Total: 65.15'
 	],
 	[
-		new Product('imported bottle of perfume', Price::of(27.99), 1, [
+		Product::create('imported bottle of perfume', Price::of(27.99), 1, [
 			new StandardTaxRate(),
 			new ImportTaxRate()
 		]),
-		new Product('bottle of perfume', Price::of(18.99), 1, [
+		Product::create('bottle of perfume', Price::of(18.99), 1, [
 			new StandardTaxRate()
 		]),
-		new Product('packet of headache pills', Price::of(9.75), 1, [
-			new TaxFreeRate()
+		Product::create('packet of headache pills', Price::of(9.75), 1, [
+			new FreeTaxRate()
 		]),
-		new Product('imported box of chocolates', Price::of(11.25), 3, [
-			new TaxFreeRate(),
+		Product::create('imported box of chocolates', Price::of(11.25), 3, [
+			new FreeTaxRate(),
 			new ImportTaxRate()
 		]),
 		'Sales Taxes: 7.90',
@@ -54,9 +54,6 @@ $carts = [
 	]
 ];
 
-if (count($argv) > 1) {
-    $days = (int) $argv[1];
-}
 $i = 1;
 foreach ($carts as $cart) {
 	echo "-------- Output " , $i++ , " --------\n";

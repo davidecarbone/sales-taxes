@@ -2,11 +2,10 @@
 
 namespace SalesTaxes\Unit;
 
-use Brick\Math\RoundingMode;
-use Brick\Money\Context\CashContext;
-use Brick\Money\Money;
 use PHPUnit\Framework\TestCase;
 use SalesTaxes\Product\Price;
+use SalesTaxes\Product\Tax;
+use SalesTaxes\TaxRate\StandardTaxRate;
 
 class PriceTest extends TestCase
 {
@@ -20,29 +19,36 @@ class PriceTest extends TestCase
 	}
 
 	/** @test */
-	public function it_can_be_multiplied()
+	public function it_calculates_taxes()
 	{
-		$price = Price::of(11.25)
-			->multipliedBy(0.1);
+		$price = Price::of(10.99);
+		$tax = $price->taxForRate(new StandardTaxRate());
 
-		$this->assertEquals(Price::of(1.13), $price);
+		$this->assertEquals(Tax::of(1.10), $tax);
 	}
 
 	/** @test */
-	public function it_rounds_to_nearest_five_cents_when_summing_money()
-	{
-		$price = Price::of(11.25)
-			->plus(Money::of(1.13, 'EUR', new CashContext(5), RoundingMode::UP));
-
-		$this->assertEquals(Price::of(12.40), $price);
-	}
-
-	/** @test */
-	public function it_does_not_round_to_nearest_five_cents_when_summing_another_price()
+	public function it_does_not_round_to_nearest_five_cents_when_summing_another_cost()
 	{
 		$price = Price::of(11.25)
 			->add(Price::of(1.13));
 
 		$this->assertEquals(Price::of(12.38), $price);
+	}
+
+	/** @test */
+	public function it_can_be_exported_to_float()
+	{
+		$price = Price::of(11);
+
+		$this->assertSame(11.00, $price->toFloat());
+	}
+
+	/** @test */
+	public function it_can_be_exported_to_string()
+	{
+		$price = Price::of(11);
+
+		$this->assertSame('11.00', (string)$price);
 	}
 }
